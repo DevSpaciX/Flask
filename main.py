@@ -14,6 +14,7 @@ def requirements():
         line = line.rstrip('\n')
         result.append(line)
     context['result'] = result
+    f.close()
     return render_template('requirements.html', **context)
 
 
