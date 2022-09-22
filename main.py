@@ -1,34 +1,46 @@
-import random
-from string import digits, ascii_letters, punctuation
 from flask import Flask, render_template, request
-
+from faker import Faker
+import requests
 
 app = Flask(__name__)
-PWD_ALPHABET = f"{digits}{ascii_letters}{punctuation}"
 
 
-@app.route('/', methods=['get'])
-def index():
-    return "Hello world!"
+@app.route('/requirements', methods=['get'])
+def requirements():
+    context = {}
+    result = []
+
+    with open('requirements.txt') as req_file:
+        for line in req_file:
+            line = line.rstrip('\n')
+            result.append(line)
+        context['result'] = result
+
+    return render_template('requirements.html', **context)
 
 
-@app.route('/about', methods=['get'])
-def about_us():
-    return "This is about US!"
-
-
-@app.route('/password_generator', methods=['get', 'post'])
-def password_generator():
+@app.route('/generate-users', methods=['get', 'post'])
+def generate_users():
+    fake = Faker()
     context = {}
 
     if request.method == 'POST':
-        pwd = ""
-        pwd_length = int(request.form['pwd_length'])
-        for _ in range(pwd_length):
-            pwd += random.choice(PWD_ALPHABET)
-        context['pwd'] = pwd
+        result = []
 
-    return render_template('password_generator.html', **context)
+        user_length = int(request.form['user_length'])
+        for _ in range(user_length):
+            result.append(f"{fake.name()}:{fake.email()}")
+        context['result'] = result
+
+    return render_template('generate_users.html', **context)
+
+
+@app.route('/space', methods=['get'])
+def space_mans():
+    r = requests.get("http://api.open-notify.org/astros.json")
+    space_mans_count = r.json()["number"]
+
+    return f"Astronauts now: {space_mans_count}"
 
 
 if __name__ == '__main__':
