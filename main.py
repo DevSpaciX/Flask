@@ -9,12 +9,13 @@ app = Flask(__name__)
 def requirements():
     context = {}
     result = []
-    f = open('requirements.txt', encoding="utf-8")
-    for line in f:
-        line = line.rstrip('\n')
-        result.append(line)
-    context['result'] = result
-    f.close()
+
+    with open('requirements.txt') as req_file:
+        for line in req_file:
+            line = line.rstrip('\n')
+            result.append(line)
+        context['result'] = result
+
     return render_template('requirements.html', **context)
 
 
